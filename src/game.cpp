@@ -1,35 +1,62 @@
-#include <headers/game.hpp> // Inkludiert die Header-Datei "game.hpp", die die Deklaration der Game-Klasse enthält.
+#include <headers/game.hpp>  // Inkludiere den Header der Game-Klasse.
 
+// Konstruktor der Game-Klasse.
 Game::Game(const char* title, int x, int y, int w, int h, Uint32 flags) {
-    SDL_Init(SDL_INIT_EVERYTHING); // Initialisiert die SDL-Bibliothek für alle verfügbaren Subsysteme.
+    SDL_Init(SDL_INIT_EVERYTHING);     // Initialisiere die SDL-Bibliothek.
 
-    _window = SDL_CreateWindow(title, x, y, w, h, flags); // Erstellt ein SDL-Fenster mit den übergebenen Parametern.
-
-    _renderer = SDL_CreateRenderer(_window, -1, 0); // Erstellt einen SDL-Renderer, der für die Darstellung verwendet wird.
+    window = SDL_CreateWindow(title, x, y, w, h, flags);     // Erzeuge ein SDL-Fenster mit den angegebenen Parametern.
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);     // Erzeuge einen SDL-Renderer für das Fenster.
 };
 
-Game::~Game() {}; // Destruktor der Game-Klasse.
-
+// Die run-Funktion, die den Spiel-Loop steuert.
 void Game::run() {
-   gameloop(); // Startet die Hauptschleife des Spiels.
+    display();     // Zeige das gerenderte Bild an.
+    clear();
 }
 
-void Game::gameloop() {
-    while (_gameState != GameState::EXIT) {
-        handleEvents(); // Die Hauptschleife des Spiels, die so lange läuft, bis der Spielzustand auf EXIT gesetzt wird.
+// Funktion zum Laden einer Textur aus einer Bilddatei.
+SDL_Texture* Game::loadTexture(const char* filePath) {
+    SDL_Texture* tex = NULL;
+
+    tex = IMG_LoadTexture(renderer, filePath);     // Lade die Textur aus der angegebenen Datei.
+
+    // Überprüfe, ob die Textur erfolgreich geladen wurde.
+    if(tex == NULL) {
+        std::cout << "Bild konnte nicht aus Dateipfad geladen werden: " << filePath << SDL_GetError() << std::endl; 
     }
+
+    return tex;     // Gib die geladene Textur zurück.
+};
+
+// Funktion zum Rendern einer Textur auf dem Bildschirm.
+void Game::render(SDL_Texture* tex) {
+    SDL_Rect src;
+    src.x = 0;
+    src.y = 0;
+    src.w = 800;
+    src.h = 800;
+
+    SDL_Rect dst;
+    dst.x = 0;
+    dst.y = 0;
+    dst.w = 800;
+    dst.h = 700;
+
+    // Kopiere die Textur auf den Renderer und positioniere sie.
+    SDL_RenderCopy(renderer, tex, &src, &dst);
 }
 
-void Game::handleEvents() {
-    SDL_Event evnt;
-    SDL_PollEvent(&evnt); // Behandelt SDL-Ereignisse, indem sie aus der Ereignisschlange geholt werden.
+// Funktion zum Anzeigen des gerenderten Bildes.
+void Game::display() {
+    SDL_RenderPresent(renderer);     // Präsentiere den Renderer, um das gerenderte Bild auf dem Bildschirm anzuzeigen.
+};
 
-    switch (evnt.type) {
-        case SDL_QUIT:
-            _gameState = GameState::EXIT; // Wenn das SDL-QUIT-Ereignis auftritt (z.B. Fenster schließen), wird der Spielzustand auf EXIT gesetzt.
-            break;
-        
-    default:
-        break;
-    }
-}
+// Funktion zum Löschen des Bildschirms.
+void Game::clear() {
+    SDL_RenderClear(renderer);     // Lösche den aktuellen Inhalt des Renderers.
+};
+
+// Funktion zum Aufräumen und Freigeben von Ressourcen.
+void Game::cleanUp() {
+    SDL_DestroyWindow(window);     // Zerstöre das SDL-Fenster und den Renderer.
+};

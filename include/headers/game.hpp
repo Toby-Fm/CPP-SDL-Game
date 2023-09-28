@@ -1,26 +1,26 @@
-#pragma once //Stellt sicher, dass diese Header-Datei nur einmal eingefügt wird.
+#pragma once  // Verhindert, dass dieser Header mehrfach eingebunden wird.
+
 #include <iostream>
+#include <SDL/SDL.h>  // SDL-Bibliothek für die Spieleentwicklung.
+#include <SDL/SDL_image.h>  // SDL-Image für das Laden von Bilddateien.
 
-// Inkludiert die Header-Dateien von SDL und SDL_image für die Spieleentwicklung.
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-
-enum class GameState {PLAY, EXIT}; // Definiert einen Aufzählungstyp (enum class) namens GameState mit den Werten PLAY und EXIT,
+enum class GameState { PLAY, EXIT }; // Enum zur Darstellung des Spielzustands.
 
 class Game {
     public:
-        Game(const char* title, int x, int y, int w, int h, Uint32 flags); // Konstruktor der Game-Klasse mit Parametern für die Fensterinitialisierung.
-        ~Game();// Destruktor der Game-Klasse.
+        Game(const char* title, int x, int y, int w, int h, Uint32 flags);    // Konstruktor für die Game-Klasse.
+        
+        GameState gameState;    // Enum-Instanz für den aktuellen Spielzustand.
+        SDL_Texture* loadTexture(const char* filePath);    // Funktion zum Laden einer Textur aus einer Bilddatei.
 
-        void run(); // Öffentliche Methode für die Spielsteuerung.
+        void render(SDL_Texture* tex);    // Funktion zum Rendern einer Textur auf dem Bildschirm.
+        void run();    // Funktion zum Starten des Spiel-Loops.
 
     private:
-        void gameloop(); //Methode für die Spiel-Hauptschleife.
-
-        void handleEvents(); //Methode zur Behandlung von Ereignissen (Events) im Spiel.
-
-        SDL_Window* _window;
-        SDL_Renderer* _renderer; // Zeiger auf SDL-Fenster und -Renderer.
-
-        GameState _gameState; // Aktueller Spielzustand.
+        void clear();    // Hilfsfunktion zum Löschen des Bildschirms.
+        void display();    // Hilfsfunktion zum Anzeigen des gerenderten Bildes.
+        void cleanUp();    // Hilfsfunktion zum Aufräumen und Freigeben von Ressourcen.
+        
+        SDL_Window* window;    // Zeiger auf das SDL-Fenster.
+        SDL_Renderer* renderer;    // Zeiger auf den SDL-Renderer, der das Rendern von Texturen ermöglicht.
 };
